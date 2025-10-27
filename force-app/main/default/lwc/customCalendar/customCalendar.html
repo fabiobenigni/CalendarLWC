@@ -80,6 +80,12 @@
                                 variant={isDayView} 
                                 onclick={handleViewChange}>
                             </lightning-button>
+                            <lightning-button 
+                                label="Availability" 
+                                data-view="availability"
+                                variant={isAvailabilityView} 
+                                onclick={handleViewChange}>
+                            </lightning-button>
                         </lightning-button-group>
                     </div>
                 </div>
@@ -186,6 +192,40 @@
                                         </div>
                                     </template>
                                 </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Vista Availability -->
+                <template if:true={showAvailabilityView}>
+                    <div class="availability-view">
+                        <div class="availability-grid">
+                            <!-- Header colonna orari -->
+                            <div class="time-column-header"></div>
+                            
+                            <!-- Header calendari -->
+                            <template for:each={calendarHeadersData} for:item="cal">
+                                <div key={cal.key} class="calendar-column-header">
+                                    <span class="calendar-name">{cal.name}</span>
+                                </div>
+                            </template>
+
+                            <!-- Griglia oraria -->
+                            <template for:each={gridRowsData} for:item="row">
+                                <!-- Colonna orario -->
+                                <div key={row.key} class="time-slot-label">{row.timeLabel}</div>
+                                
+                                <!-- Slot per ogni calendario -->
+                                <template for:each={row.cells} for:item="cell">
+                                    <div key={cell.key} class="time-slot">
+                                        <template for:each={cell.events} for:item="event">
+                                            <div key={event.id} class="slot-event" style={event.style} onclick={handleEventClick} data-id={event.id}>
+                                                {event.title}
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
                             </template>
                         </div>
                     </div>

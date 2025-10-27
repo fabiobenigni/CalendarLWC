@@ -61,6 +61,10 @@ export default class CustomCalendar extends LightningElement {
         return this.currentView === 'day';
     }
 
+    get showAvailabilityView() {
+        return this.currentView === 'availability';
+    }
+
     // Getter per varianti pulsanti
     get isMonthView() {
         return this.currentView === 'month' ? 'brand' : 'neutral';
@@ -74,6 +78,10 @@ export default class CustomCalendar extends LightningElement {
         return this.currentView === 'day' ? 'brand' : 'neutral';
     }
 
+    get isAvailabilityView() {
+        return this.currentView === 'availability' ? 'brand' : 'neutral';
+    }
+
     // Getter di sicurezza per le viste
     get monthDaysData() {
         return this.calendarDays?.days || [];
@@ -85,6 +93,10 @@ export default class CustomCalendar extends LightningElement {
 
     get gridRowsData() {
         return this.calendarDays?.gridRows || [];
+    }
+
+    get calendarHeadersData() {
+        return this.calendarDays?.calendarHeaders || [];
     }
 
     // Getter per debug
@@ -261,6 +273,8 @@ export default class CustomCalendar extends LightningElement {
             this.generateWeekView();
         } else if (this.showDayView) {
             this.generateDayView();
+        } else if (this.showAvailabilityView) {
+            this.generateAvailabilityView();
         }
     }
 
@@ -403,6 +417,59 @@ export default class CustomCalendar extends LightningElement {
         });
 
         this.calendarDays = { days: [], weekDays: [], gridRows };
+    }
+
+    /**
+     * Genera la vista Availability - mostra più calendari affiancati per un giorno
+     */
+    generateAvailabilityView() {
+        const timeSlots = this.generateTimeSlots();
+        
+        // Per ora mostriamo solo "My Events" - sarà espanso con multi-calendar
+        const calendars = [
+            { id: 'myEvents', name: 'Eventi personali', color: '#1589EE' }
+        ];
+
+        // Crea righe della griglia
+        const gridRows = timeSlots.map((slot, index) => {
+            // Per ogni slot, crea celle per ogni calendario
+            const cells = calendars.map(calendar => {
+                const dayEvents = this.getEventsForDay(this.currentDate);
+                const slotEvents = dayEvents.filter(event => {
+                    const eventStart = event.date.getHours() * 60 + event.date.getMinutes();
+                    return slot.minutes <= eventStart && slot.minutes + this.slotDuration > eventStart;
+                }).map(event => ({
+                    ...event,
+                    style: `background-color: ${event.color}; border-left: 4px solid ${event.color};`
+                }));
+
+                return {
+                    key: `cell-${calendar.id}-${index}`,
+                    calendarId: calendar.id,
+                    events: slotEvents
+                };
+            });
+
+            return {
+                key: `row-${index}`,
+                timeLabel: slot.time,
+                cells: cells
+            };
+        });
+
+        // Prepara header con nomi calendari
+        const calendarHeaders = calendars.map(calendar => ({
+            key: calendar.id,
+            name: calendar.name,
+            color: calendar.color
+        }));
+
+        this.calendarDays = { 
+            days: [], 
+            weekDays: [], 
+            gridRows: gridRows,
+            calendarHeaders: calendarHeaders 
+        };
     }
 
     /**
