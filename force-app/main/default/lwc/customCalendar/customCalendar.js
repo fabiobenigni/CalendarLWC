@@ -25,6 +25,36 @@ export default class CustomCalendar extends LightningElement {
 
     // Sidebar
     @track isSidebarOpen = true;
+    
+    // Gestione calendari e colori
+    get myCalendars() {
+        return this._myCalendars.map(cal => ({
+            ...cal,
+            colorStyle: `background-color: ${cal.color};`
+        }));
+    }
+    
+    set myCalendars(value) {
+        this._myCalendars = value;
+    }
+    
+    _myCalendars = [
+        { id: 'myEvents', name: 'Eventi personali', color: '#1589EE', visible: true }
+    ];
+    
+    // Palette colori disponibili
+    get calendarColors() {
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+            '#1589EE', '#E74C3C', '#3498DB', '#2ECC71', '#F39C12',
+            '#9B59B6', '#34495E', '#16A085', '#E67E22', '#95A5A6'
+        ];
+        return colors.map(color => ({
+            value: color,
+            style: `background-color: ${color};`
+        }));
+    }
 
     connectedCallback() {
         this.currentView = this.defaultView || 'month';
@@ -41,11 +71,35 @@ export default class CustomCalendar extends LightningElement {
         this.isSidebarOpen = !this.isSidebarOpen;
     }
 
-    // Handle calendar toggle (per future implementazioni multi-calendar)
+    // Handle calendar toggle (visibilità)
     handleCalendarToggle(event) {
-        const calendarName = event.currentTarget.dataset.calendar;
-        // Per ora non fa nulla, sarà implementato nello step multi-calendar
-        console.log('Toggle calendar:', calendarName);
+        const calendarId = event.currentTarget.dataset.calendar;
+        const calendar = this._myCalendars.find(cal => cal.id === calendarId);
+        if (calendar) {
+            calendar.visible = event.target.checked;
+            this._myCalendars = [...this._myCalendars]; // Trigger reactivity
+            this.generateCalendar(); // Rigenera vista
+        }
+    }
+
+    // Gestione cambio colore calendario
+    handleColorChange(event) {
+        const calendarId = event.currentTarget.dataset.calendar;
+        const newColor = event.currentTarget.dataset.color;
+        
+        const calendar = this._myCalendars.find(cal => cal.id === calendarId);
+        if (calendar) {
+            calendar.color = newColor;
+            this._myCalendars = [...this._myCalendars]; // Trigger reactivity
+            
+            // Aggiorna colore eventi già caricati
+            this.events = this.events.map(evt => ({
+                ...evt,
+                color: newColor
+            }));
+            
+            this.generateCalendar(); // Rigenera vista con nuovo colore
+        }
     }
 
     // Getter per le viste (booleani per template)
@@ -184,6 +238,10 @@ export default class CustomCalendar extends LightningElement {
                 const startDate = this.parseApexDateTime(event.startDateTime);
                 const endDate = this.parseApexDateTime(event.endDateTime);
                 
+                // Usa il colore del calendario configurato, altrimenti quello di default
+                const myEventsCalendar = this._myCalendars.find(cal => cal.id === 'myEvents');
+                const eventColor = myEventsCalendar ? myEventsCalendar.color : event.color;
+                
                 return {
                     id: event.id,
                     title: event.title,
@@ -191,7 +249,7 @@ export default class CustomCalendar extends LightningElement {
                     endDate: endDate,
                     startTime: this.formatTime(startDate),
                     endTime: this.formatTime(endDate),
-                    color: event.color,
+                    color: eventColor,
                     description: event.description,
                     location: event.location,
                     ownerName: event.ownerName,
@@ -433,10 +491,8 @@ export default class CustomCalendar extends LightningElement {
     generateAvailabilityView() {
         const timeSlots = this.generateTimeSlots();
         
-        // Per ora mostriamo solo "My Events" - sarà espanso con multi-calendar
-        const calendars = [
-            { id: 'myEvents', name: 'Eventi personali', color: '#1589EE' }
-        ];
+        // Usa i calendari configurati e visibili
+        const calendars = this._myCalendars.filter(cal => cal.visible);
 
         // Crea righe della griglia
         const gridRows = timeSlots.map((slot, index) => {

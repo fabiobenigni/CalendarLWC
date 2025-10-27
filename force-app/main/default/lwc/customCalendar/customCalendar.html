@@ -8,15 +8,44 @@
                     <div class="sidebar-section">
                         <h3 class="sidebar-title">I Miei Calendari</h3>
                         <div class="calendar-list">
-                            <div class="calendar-item">
-                                <lightning-input 
-                                    type="checkbox" 
-                                    label="Eventi personali"
-                                    checked
-                                    onchange={handleCalendarToggle}
-                                    data-calendar="myEvents">
-                                </lightning-input>
-                            </div>
+                            <template for:each={myCalendars} for:item="cal">
+                                <div key={cal.id} class="calendar-item">
+                                    <div class="calendar-row">
+                                        <div class="calendar-checkbox">
+                                            <span class="calendar-color-indicator" style={cal.colorStyle}></span>
+                                            <lightning-input 
+                                                type="checkbox" 
+                                                label={cal.name}
+                                                checked={cal.visible}
+                                                onchange={handleCalendarToggle}
+                                                data-calendar={cal.id}>
+                                            </lightning-input>
+                                        </div>
+                                        <lightning-button-menu 
+                                            alternative-text="Opzioni calendario"
+                                            icon-size="x-small"
+                                            menu-alignment="right"
+                                            variant="border-filled">
+                                            <div class="color-picker-menu">
+                                                <div class="color-picker-title">Scegli colore</div>
+                                                <div class="color-picker-grid">
+                                                    <template for:each={calendarColors} for:item="colorObj">
+                                                        <button 
+                                                            key={colorObj.value}
+                                                            class="color-swatch"
+                                                            style={colorObj.style}
+                                                            data-calendar={cal.id}
+                                                            data-color={colorObj.value}
+                                                            onclick={handleColorChange}
+                                                            title={colorObj.value}>
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </lightning-button-menu>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
 
