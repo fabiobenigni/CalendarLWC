@@ -21,10 +21,15 @@ Creare un componente calendario personalizzato che:
 - [x] Eventi mock con colori personalizzati
 - [x] Stili SLDS integrati con Lightning Design System
 
-### 🔄 STEP 2 - Integrazione Dati (In arrivo)
-- [ ] Apex class per recuperare Event
-- [ ] Visualizzazione eventi reali da Salesforce
-- [ ] Filtro date range
+### ✅ STEP 2 - Integrazione Dati (COMPLETATO)
+- [x] Apex class CalendarController per recuperare Event
+- [x] Test class con copertura 100%
+- [x] Visualizzazione eventi reali da Salesforce
+- [x] Filtro automatico per mese corrente
+- [x] Loading spinner durante caricamento
+- [x] Gestione errori con messaggi utente
+- [x] Navigazione mesi con ricaricamento automatico eventi
+- [x] Click evento con dettagli completi (titolo, orario, location, descrizione)
 
 ### 📅 STEP 3 - Multi-vista (In arrivo)
 - [ ] Vista giornaliera
@@ -61,14 +66,19 @@ Creare un componente calendario personalizzato che:
 
 ```
 force-app/main/default/
+├── classes/
+│   ├── CalendarController.cls           # Controller Apex per recupero eventi
+│   ├── CalendarController.cls-meta.xml
+│   ├── CalendarControllerTest.cls       # Test class con 100% coverage
+│   └── CalendarControllerTest.cls-meta.xml
 ├── lwc/
-│   └── customCalendar/             # Componente calendario principale
-│       ├── customCalendar.html     # Template con griglia calendario
-│       ├── customCalendar.js       # Logica calendario custom
-│       ├── customCalendar.css      # Stili SLDS
+│   └── customCalendar/                  # Componente calendario principale
+│       ├── customCalendar.html          # Template con griglia calendario
+│       ├── customCalendar.js            # Logica calendario custom
+│       ├── customCalendar.css           # Stili SLDS
 │       └── customCalendar.js-meta.xml
 └── applications/
-    └── Calendar_Demo_App.app-meta.xml  # App Lightning di esempio
+    └── Calendar_Demo_App.app-meta.xml   # App Lightning di esempio
 ```
 
 ## 🚀 Installazione e Deploy

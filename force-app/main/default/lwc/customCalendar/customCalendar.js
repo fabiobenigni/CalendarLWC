@@ -1,41 +1,75 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import getEvents from '@salesforce/apex/CalendarController.getEvents';
 
 export default class CustomCalendar extends LightningElement {
     currentDate = new Date();
     weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
     calendarDays = [];
-
-    // Eventi mock per lo Step 1
-    mockEvents = [
-        {
-            id: '1',
-            title: 'Meeting con Cliente',
-            date: new Date(),
-            startTime: '10:00',
-            endTime: '11:00',
-            color: '#1589EE'
-        },
-        {
-            id: '2',
-            title: 'Demo Prodotto',
-            date: new Date(Date.now() + 86400000), // +1 giorno
-            startTime: '14:00',
-            endTime: '15:30',
-            color: '#06A59A'
-        },
-        {
-            id: '3',
-            title: 'Formazione Team',
-            date: new Date(Date.now() + 172800000), // +2 giorni
-            startTime: '09:00',
-            endTime: '12:00',
-            color: '#E3652A'
-        }
-    ];
+    events = [];
+    isLoading = false;
+    error;
 
     connectedCallback() {
-        this.generateCalendar();
+        this.loadEvents();
         console.log('Calendario custom inizializzato');
+    }
+
+    /**
+     * Carica gli eventi dal server per il mese corrente
+     */
+    loadEvents() {
+        this.isLoading = true;
+        this.error = undefined;
+        
+        // Calcola primo e ultimo giorno del mese
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        const startDate = new Date(year, month, 1);
+        const endDate = new Date(year, month + 1, 0, 23, 59, 59);
+        
+        console.log('Caricamento eventi da', startDate, 'a', endDate);
+        
+        // Chiama Apex
+        getEvents({ 
+            startDate: startDate.toISOString().split('T')[0], 
+            endDate: endDate.toISOString().split('T')[0] 
+        })
+        .then(data => {
+            console.log('Eventi ricevuti:', data);
+            // Trasforma eventi per il calendario
+            this.events = data.map(event => ({
+                id: event.id,
+                title: event.title,
+                date: new Date(event.startDateTime),
+                startTime: this.formatTime(new Date(event.startDateTime)),
+                endTime: this.formatTime(new Date(event.endDateTime)),
+                color: event.color,
+                description: event.description,
+                location: event.location,
+                ownerName: event.ownerName,
+                eventType: event.eventType
+            }));
+            
+            this.isLoading = false;
+            this.generateCalendar();
+        })
+        .catch(error => {
+            console.error('Errore caricamento eventi:', error);
+            this.error = error.body ? error.body.message : 'Errore sconosciuto';
+            this.isLoading = false;
+            this.events = [];
+            this.generateCalendar();
+        });
+    }
+
+    /**
+     * Formatta DateTime in stringa ora HH:MM
+     */
+    formatTime(dateTime) {
+        if (!dateTime) return '';
+        const hours = String(dateTime.getHours()).padStart(2, '0');
+        const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
     }
 
     get currentMonthYear() {
@@ -85,7 +119,7 @@ export default class CustomCalendar extends LightningElement {
                 currentDay.getFullYear() === today.getFullYear();
             
             // Trova eventi per questo giorno
-            const dayEvents = this.mockEvents.filter(event => {
+            const dayEvents = this.events.filter(event => {
                 return event.date.getDate() === day &&
                        event.date.getMonth() === month &&
                        event.date.getFullYear() === year;
@@ -113,7 +147,7 @@ export default class CustomCalendar extends LightningElement {
             this.currentDate.getMonth() - 1,
             1
         );
-        this.generateCalendar();
+        this.loadEvents();
     }
 
     nextMonth() {
@@ -122,15 +156,23 @@ export default class CustomCalendar extends LightningElement {
             this.currentDate.getMonth() + 1,
             1
         );
-        this.generateCalendar();
+        this.loadEvents();
     }
 
     handleEventClick(event) {
         const eventId = event.currentTarget.dataset.id;
-        const eventData = this.mockEvents.find(e => e.id === eventId);
+        const eventData = this.events.find(e => e.id === eventId);
         if (eventData) {
             // Placeholder per Step futuri - popup dettaglio
-            alert(`Evento: ${eventData.title}\nOrario: ${eventData.startTime} - ${eventData.endTime}`);
+            let message = `📅 ${eventData.title}\n`;
+            message += `🕐 ${eventData.startTime} - ${eventData.endTime}\n`;
+            if (eventData.location) {
+                message += `📍 ${eventData.location}\n`;
+            }
+            if (eventData.description) {
+                message += `📝 ${eventData.description}`;
+            }
+            alert(message);
         }
     }
 }

@@ -6,15 +6,37 @@
                 <lightning-button 
                     icon-name="utility:chevronleft" 
                     variant="neutral" 
-                    onclick={previousMonth}>
+                    onclick={previousMonth}
+                    disabled={isLoading}>
                 </lightning-button>
                 <h2 class="calendar-title">{currentMonthYear}</h2>
                 <lightning-button 
                     icon-name="utility:chevronright" 
                     variant="neutral" 
-                    onclick={nextMonth}>
+                    onclick={nextMonth}
+                    disabled={isLoading}>
                 </lightning-button>
             </div>
+
+            <!-- Loading spinner -->
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center slds-m-vertical_medium">
+                    <lightning-spinner alternative-text="Caricamento eventi..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Messaggio errore -->
+            <template if:true={error}>
+                <div class="slds-m-bottom_medium">
+                    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                        <span class="slds-assistive-text">Errore</span>
+                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small">
+                            <lightning-icon icon-name="utility:error" alternative-text="error" size="x-small" variant="inverse"></lightning-icon>
+                        </span>
+                        <h2>{error}</h2>
+                    </div>
+                </div>
+            </template>
 
             <!-- Griglia calendario -->
             <div class="calendar-grid">
