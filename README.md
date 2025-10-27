@@ -101,4 +101,4 @@ Progetto privato. FullCalendar.js è distribuito con licenza MIT.
 
 ## 👤 Autore
 
-Sviluppo: Francesco Benigni
+Sviluppo: Fabio Benigni
