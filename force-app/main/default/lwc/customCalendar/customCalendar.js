@@ -23,9 +23,29 @@ export default class CustomCalendar extends LightningElement {
     @track showEventModal = false;
     @track selectedEvent = null;
 
+    // Sidebar
+    @track isSidebarOpen = true;
+
     connectedCallback() {
         this.currentView = this.defaultView || 'month';
         this.loadEvents();
+    }
+
+    // Getter per la classe CSS della sidebar
+    get sidebarClass() {
+        return this.isSidebarOpen ? 'calendar-sidebar open' : 'calendar-sidebar collapsed';
+    }
+
+    // Toggle sidebar
+    toggleSidebar() {
+        this.isSidebarOpen = !this.isSidebarOpen;
+    }
+
+    // Handle calendar toggle (per future implementazioni multi-calendar)
+    handleCalendarToggle(event) {
+        const calendarName = event.currentTarget.dataset.calendar;
+        // Per ora non fa nulla, sarà implementato nello step multi-calendar
+        console.log('Toggle calendar:', calendarName);
     }
 
     // Getter per le viste (booleani per template)

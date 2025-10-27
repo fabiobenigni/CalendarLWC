@@ -1,3 +1,65 @@
+/* Layout principale con sidebar */
+.calendar-container {
+    display: flex;
+    gap: 0;
+    height: 100%;
+}
+
+/* Sidebar */
+.calendar-sidebar {
+    background-color: #f3f3f3;
+    border-right: 1px solid #c9c9c9;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.calendar-sidebar.open {
+    width: 250px;
+    min-width: 250px;
+}
+
+.calendar-sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    border-right: none;
+}
+
+.sidebar-content {
+    width: 250px;
+    padding: 1rem;
+}
+
+.sidebar-section {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0 0 0.75rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #c9c9c9;
+}
+
+.calendar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.calendar-item {
+    padding: 0.25rem 0;
+}
+
+/* Main content */
+.calendar-main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 0 1rem;
+}
+
 /* Header con navigazione */
 .calendar-header {
     display: flex;
@@ -9,6 +71,11 @@
     border-radius: 0.25rem;
     flex-wrap: wrap;
     gap: 1rem;
+}
+
+.sidebar-toggle {
+    display: flex;
+    align-items: center;
 }
 
 .navigation-buttons {
