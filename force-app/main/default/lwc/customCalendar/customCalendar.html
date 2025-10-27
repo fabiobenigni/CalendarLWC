@@ -1,21 +1,46 @@
 <template>
     <lightning-card title="Calendario Personalizzato" icon-name="standard:event">
         <div class="slds-p-around_medium">
-            <!-- Header con navigazione -->
+            <!-- Header con navigazione e selezione vista -->
             <div class="calendar-header">
-                <lightning-button 
-                    icon-name="utility:chevronleft" 
-                    variant="neutral" 
-                    onclick={previousMonth}
-                    disabled={isLoading}>
-                </lightning-button>
-                <h2 class="calendar-title">{currentMonthYear}</h2>
-                <lightning-button 
-                    icon-name="utility:chevronright" 
-                    variant="neutral" 
-                    onclick={nextMonth}
-                    disabled={isLoading}>
-                </lightning-button>
+                <div class="navigation-buttons">
+                    <lightning-button 
+                        icon-name="utility:chevronleft" 
+                        variant="neutral" 
+                        onclick={previousMonth}
+                        disabled={isLoading}>
+                    </lightning-button>
+                    <h2 class="calendar-title">{currentMonthYear}</h2>
+                    <lightning-button 
+                        icon-name="utility:chevronright" 
+                        variant="neutral" 
+                        onclick={nextMonth}
+                        disabled={isLoading}>
+                    </lightning-button>
+                </div>
+                
+                <div class="view-selector">
+                    <lightning-button-group>
+                        <lightning-button 
+                            label="Mese" 
+                            value="month"
+                            variant={isMonthView} 
+                            onclick={handleViewChange}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Settimana" 
+                            value="week"
+                            variant={isWeekView} 
+                            onclick={handleViewChange}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Giorno" 
+                            value="day"
+                            variant={isDayView} 
+                            onclick={handleViewChange}>
+                        </lightning-button>
+                    </lightning-button-group>
+                </div>
             </div>
 
             <!-- Loading spinner -->
@@ -38,27 +63,92 @@
                 </div>
             </template>
 
-            <!-- Griglia calendario -->
-            <div class="calendar-grid">
-                <!-- Header giorni settimana -->
-                <template for:each={weekDays} for:item="day">
-                    <div key={day} class="calendar-weekday">{day}</div>
-                </template>
+            <!-- Vista Mensile -->
+            <template if:true={showMonthView}>
+                <div class="calendar-grid">
+                    <!-- Header giorni settimana -->
+                    <template for:each={weekDays} for:item="day">
+                        <div key={day} class="calendar-weekday">{day}</div>
+                    </template>
 
-                <!-- Celle giorni -->
-                <template for:each={calendarDays} for:item="dayInfo">
-                    <div key={dayInfo.key} class={dayInfo.className}>
-                        <div class="day-number">{dayInfo.day}</div>
-                        <template if:true={dayInfo.hasEvents}>
-                            <template for:each={dayInfo.events} for:item="event">
-                                <div key={event.id} class="calendar-event" style={event.style} onclick={handleEventClick} data-id={event.id}>
-                                    {event.title}
+                    <!-- Celle giorni -->
+                    <template for:each={calendarDays} for:item="dayInfo">
+                        <div key={dayInfo.key} class={dayInfo.className}>
+                            <div class="day-number">{dayInfo.day}</div>
+                            <template if:true={dayInfo.hasEvents}>
+                                <template for:each={dayInfo.events} for:item="event">
+                                    <div key={event.id} class="calendar-event" style={event.style} onclick={handleEventClick} data-id={event.id}>
+                                        {event.title}
+                                    </div>
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Vista Settimanale -->
+            <template if:true={showWeekView}>
+                <div class="week-view">
+                    <div class="week-grid">
+                        <!-- Header colonna orari -->
+                        <div class="time-column-header"></div>
+                        
+                        <!-- Header giorni settimana -->
+                        <template for:each={calendarDays.weekDays} for:item="day">
+                            <div key={day.key} class="week-day-header">
+                                <div class="day-name">{day.dayName}</div>
+                                <div class="day-number">{day.dayNumber}</div>
+                            </div>
+                        </template>
+
+                        <!-- Griglia oraria -->
+                        <template for:each={calendarDays.gridRows} for:item="row">
+                            <!-- Colonna orario -->
+                            <div key={row.key} class="time-slot-label">{row.timeLabel}</div>
+                            
+                            <!-- Slot per ogni giorno -->
+                            <template for:each={row.cells} for:item="cell">
+                                <div key={cell.key} class="time-slot">
+                                    <template for:each={cell.events} for:item="event">
+                                        <div key={event.id} class="slot-event" style={event.style} onclick={handleEventClick} data-id={event.id}>
+                                            {event.title}
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
                         </template>
                     </div>
-                </template>
-            </div>
+                </div>
+            </template>
+
+            <!-- Vista Giornaliera -->
+            <template if:true={showDayView}>
+                <div class="day-view">
+                    <div class="day-grid">
+                        <!-- Header -->
+                        <div class="time-column-header"></div>
+                        <div class="day-column-header">
+                            Eventi del giorno
+                        </div>
+
+                        <!-- Griglia oraria -->
+                        <template for:each={calendarDays.gridRows} for:item="row">
+                            <!-- Colonna orario -->
+                            <div key={row.key} class="time-slot-label">{row.timeLabel}</div>
+                            
+                            <!-- Slot eventi -->
+                            <div key={row.timeLabel} class="time-slot">
+                                <template for:each={row.events} for:item="event">
+                                    <div key={event.id} class="slot-event" style={event.style} onclick={handleEventClick} data-id={event.id}>
+                                        {event.title}
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
         </div>
     </lightning-card>
 </template>

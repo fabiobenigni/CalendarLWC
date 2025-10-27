@@ -7,6 +7,14 @@
     padding: 0.75rem;
     background-color: #f3f3f3;
     border-radius: 0.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.navigation-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .calendar-title {
@@ -14,6 +22,10 @@
     font-weight: 700;
     color: #080707;
     margin: 0;
+}
+
+.view-selector {
+    margin-left: auto;
 }
 
 /* Griglia calendario */
@@ -87,6 +99,106 @@
 
 .calendar-event:hover {
     opacity: 0.8;
+}
+
+/* Vista Settimanale */
+.week-view {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(5, 1fr);
+    border: 1px solid #c9c9c9;
+    background-color: #c9c9c9;
+    gap: 1px;
+    min-width: 800px;
+}
+
+.time-column-header {
+    background-color: #f3f3f3;
+    padding: 0.5rem;
+    font-weight: 700;
+    border-bottom: 2px solid #c9c9c9;
+}
+
+.week-day-header {
+    background-color: #f3f3f3;
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: 700;
+    border-bottom: 2px solid #c9c9c9;
+}
+
+.day-name {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #3e3e3c;
+}
+
+.week-day-header .day-number {
+    font-size: 1.25rem;
+    color: #080707;
+    margin-top: 0.25rem;
+}
+
+.time-slot-label {
+    background-color: #f9f9f9;
+    padding: 0.5rem;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #3e3e3c;
+    font-weight: 600;
+    border-right: 2px solid #c9c9c9;
+}
+
+.time-slot {
+    background-color: white;
+    min-height: 30px;
+    padding: 2px;
+    position: relative;
+}
+
+.slot-event {
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.slot-event:hover {
+    opacity: 0.8;
+}
+
+/* Vista Giornaliera */
+.day-view {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.day-grid {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    border: 1px solid #c9c9c9;
+    background-color: #c9c9c9;
+    gap: 1px;
+    min-width: 400px;
+}
+
+.day-column-header {
+    background-color: #f3f3f3;
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    border-bottom: 2px solid #c9c9c9;
 }
 
 /* Responsive */

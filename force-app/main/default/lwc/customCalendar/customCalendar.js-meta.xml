@@ -9,6 +9,14 @@
         <target>lightningCommunity__Page</target>
         <target>lightningCommunity__Default</target>
     </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage">
+            <property name="startTime" type="String" default="07:30" label="Ora Inizio Giornata" description="Ora di inizio della griglia oraria (formato HH:MM)" />
+            <property name="endTime" type="String" default="13:00" label="Ora Fine Giornata" description="Ora di fine della griglia oraria (formato HH:MM)" />
+            <property name="slotDuration" type="Integer" default="10" label="Durata Slot (minuti)" description="Durata di ogni slot temporale in minuti" />
+            <property name="defaultView" type="String" default="month" label="Vista Default" description="Vista iniziale del calendario" datasource="month,week,day" />
+        </targetConfig>
+    </targetConfigs>
     <masterLabel>Calendario Personalizzato</masterLabel>
     <description>Componente calendario personalizzato per visualizzare eventi, service appointment e task</description>
 </LightningComponentBundle>
