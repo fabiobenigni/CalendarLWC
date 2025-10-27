@@ -1,0 +1,105 @@
+<template>
+    <!-- Modal Backdrop -->
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-modal="true">
+        <div class="slds-modal__container">
+            <!-- Modal Header -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+                        title="Chiudi" 
+                        onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close" alternative-text="Chiudi" size="small"></lightning-icon>
+                    <span class="slds-assistive-text">Chiudi</span>
+                </button>
+                <div class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name={iconName} size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-modal__title slds-hyphenate">{modalTitle}</h2>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Modal Body -->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content">
+                <div class="slds-grid slds-wrap slds-gutters_small">
+                    <!-- Location -->
+                    <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-form-element">
+                            <span class="slds-form-element__label slds-text-title_caps">Location</span>
+                            <div class="slds-form-element__control">
+                                <span class="slds-form-element__static">{location}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Owner -->
+                    <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-form-element">
+                            <span class="slds-form-element__label slds-text-title_caps">Assegnato a</span>
+                            <div class="slds-form-element__control">
+                                <span class="slds-form-element__static">{ownerName}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Start DateTime -->
+                    <div class="slds-col slds-size_1-of-2 slds-m-top_small">
+                        <div class="slds-form-element">
+                            <span class="slds-form-element__label slds-text-title_caps">Inizio</span>
+                            <div class="slds-form-element__control">
+                                <span class="slds-form-element__static">{startDateTime}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- End DateTime -->
+                    <div class="slds-col slds-size_1-of-2 slds-m-top_small">
+                        <div class="slds-form-element">
+                            <span class="slds-form-element__label slds-text-title_caps">Fine</span>
+                            <div class="slds-form-element__control">
+                                <span class="slds-form-element__static">{endDateTime}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <template if:true={description}>
+                        <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                            <div class="slds-form-element">
+                                <span class="slds-form-element__label slds-text-title_caps">Descrizione</span>
+                                <div class="slds-form-element__control">
+                                    <span class="slds-form-element__static">{description}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- More Details Link (come nello screenshot) -->
+                <div class="slds-m-top_medium">
+                    <a href="#" onclick={handleOpenRecord} class="slds-text-link">Apri Dettagli Record</a>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={handleClose}>
+                    Chiudi
+                </button>
+                <button class="slds-button slds-button_brand" onclick={handleOpenRecord}>
+                    Apri Record
+                </button>
+                <template if:true={showFlowButton}>
+                    <button class="slds-button slds-button_brand" onclick={handleLaunchFlow}>
+                        Lancia Flow
+                    </button>
+                </template>
+            </footer>
+        </div>
+    </section>
+    
+    <!-- Modal Backdrop -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+

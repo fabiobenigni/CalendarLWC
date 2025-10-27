@@ -1,0 +1,16 @@
+/* Stili aggiuntivi per il modal, se necessario */
+.slds-modal__container {
+    max-width: 40rem;
+}
+
+.slds-form-element__static {
+    font-weight: 400;
+    color: #3e3e3c;
+}
+
+.slds-text-title_caps {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #706e6b;
+}
+

@@ -151,4 +151,13 @@
             </template>
         </div>
     </lightning-card>
+
+    <!-- Modal Dettaglio Evento -->
+    <template if:true={showEventModal}>
+        <c-event-detail-modal 
+            event-data={selectedEvent}
+            flow-api-name={flowApiName}
+            onclose={handleCloseModal}>
+        </c-event-detail-modal>
+    </template>
 </template>

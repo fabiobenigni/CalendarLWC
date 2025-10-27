@@ -41,21 +41,28 @@ Creare un componente calendario personalizzato che:
 - [x] Navigazione mese/settimana/giorno con ricaricamento automatico
 - [x] Stili responsive per griglia oraria
 
-### 👥 STEP 4 - Multi-calendar & Service Territory (In arrivo)
+### ✅ STEP 4 - Dettaglio Eventi e Interazioni (COMPLETATO)
+- [x] Modal Lightning con dettaglio evento completo
+- [x] Visualizzazione campi (titolo, orario inizio/fine, location, descrizione, owner)
+- [x] Pulsante "Apri Record" con navigazione diretta al record Salesforce
+- [x] Struttura preparata per lancio Screen Flow configurabile
+- [x] Parametro LWC configurabile per nome API del Flow (opzionale)
+- [x] Design conforme allo standard Salesforce (SLDS)
+
+### 👥 STEP 5 - Multi-calendar & Service Territory (In arrivo)
 - [ ] Selezione Service Territory
 - [ ] Lista ServiceTerritoryMembers
 - [ ] Aggiunta calendari multipli (max 10 configurabile)
 
-### 🎨 STEP 5 - Colori & Preferenze (In arrivo)
+### 🎨 STEP 6 - Colori & Preferenze (In arrivo)
 - [ ] Gestione colori personalizzati per utente
 - [ ] Salvataggio preferenze utente
 
 ### 🚀 STEP Successivi
 - [ ] Integrazione ServiceAppointment e Task
-- [ ] Popup dettaglio eventi
-- [ ] Lancio Screen Flow
 - [ ] Configurazione LWC (oggetti, drag&drop, limiti)
 - [ ] Filtri per Status
+- [ ] Implementazione completa lancio Screen Flow
 - [ ] Package unmanaged
 
 ## 🛠️ Tecnologie Utilizzate

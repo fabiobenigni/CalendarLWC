@@ -7,6 +7,7 @@ export default class CustomCalendar extends LightningElement {
     @api endTime = '13:00';
     @api slotDuration = 10;
     @api defaultView = 'month';
+    @api flowApiName; // Nome API del Flow da lanciare (opzionale)
     
     // Stato componente
     @track currentDate = new Date();
@@ -17,6 +18,10 @@ export default class CustomCalendar extends LightningElement {
     @track events = [];
     @track isLoading = false;
     @track error;
+    
+    // Modal dettaglio evento
+    @track showEventModal = false;
+    @track selectedEvent = null;
 
     connectedCallback() {
         this.currentView = this.defaultView || 'month';
@@ -143,6 +148,7 @@ export default class CustomCalendar extends LightningElement {
                     id: event.id,
                     title: event.title,
                     date: startDate,
+                    endDate: endDate,
                     startTime: this.formatTime(startDate),
                     endTime: this.formatTime(endDate),
                     color: event.color,
@@ -471,16 +477,15 @@ export default class CustomCalendar extends LightningElement {
         const eventId = event.currentTarget.dataset.id;
         const eventData = this.events.find(e => e.id === eventId);
         if (eventData) {
-            // Placeholder per Step futuri - popup dettaglio
-            let message = `📅 ${eventData.title}\n`;
-            message += `🕐 ${eventData.startTime} - ${eventData.endTime}\n`;
-            if (eventData.location) {
-                message += `📍 ${eventData.location}\n`;
-            }
-            if (eventData.description) {
-                message += `📝 ${eventData.description}`;
-            }
-            alert(message);
+            // Apre il modal con i dettagli dell'evento
+            this.selectedEvent = eventData;
+            this.showEventModal = true;
         }
+    }
+
+    handleCloseModal() {
+        // Chiude il modal
+        this.showEventModal = false;
+        this.selectedEvent = null;
     }
 }
