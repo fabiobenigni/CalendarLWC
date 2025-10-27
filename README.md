@@ -31,10 +31,13 @@ Creare un componente calendario personalizzato che:
 - [x] Navigazione mesi con ricaricamento automatico eventi
 - [x] Click evento con dettagli completi (titolo, orario, location, descrizione)
 
-### 📅 STEP 3 - Multi-vista (In arrivo)
-- [ ] Vista giornaliera
-- [ ] Vista settimanale
-- [ ] Switch tra viste
+### 📅 STEP 3 - Multi-vista & Configurazione (Prossimo)
+- [ ] Parametri configurabili LWC (orari inizio/fine, intervallo slot)
+- [ ] Vista settimanale (Lun-Ven, griglia oraria 7:30-13:00 default)
+- [ ] Vista giornaliera (stesso layout settimanale, singolo giorno)
+- [ ] Switch tra viste (Mese/Settimana/Giorno)
+- [ ] Slot temporali di 10 minuti per leggibilità eventi
+- [ ] Eventi posizionati su griglia oraria
 
 ### 👥 STEP 4 - Multi-calendar & Service Territory (In arrivo)
 - [ ] Selezione Service Territory
