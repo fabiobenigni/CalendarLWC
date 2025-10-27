@@ -382,8 +382,9 @@ export default class CustomCalendar extends LightningElement {
                 currentDay.getMonth() === today.getMonth() &&
                 currentDay.getFullYear() === today.getFullYear();
             
-            // Trova eventi per questo giorno
-            const dayEvents = this.events.filter(event => {
+            // Trova eventi per questo giorno (solo eventi visibili)
+            const visibleEvents = this.getVisibleEvents();
+            const dayEvents = visibleEvents.filter(event => {
                 return event.date.getDate() === day &&
                        event.date.getMonth() === month &&
                        event.date.getFullYear() === year;
@@ -564,10 +565,23 @@ export default class CustomCalendar extends LightningElement {
     }
 
     /**
-     * Ottiene gli eventi per un giorno specifico
+     * Ottiene gli eventi visibili (filtra in base ai calendari attivi)
+     */
+    getVisibleEvents() {
+        // Per ora tutti gli eventi sono di "myEvents", quindi filtra in base alla visibilità
+        const myEventsCalendar = this._myCalendars.find(cal => cal.id === 'myEvents');
+        if (!myEventsCalendar || !myEventsCalendar.visible) {
+            return [];
+        }
+        return this.events;
+    }
+
+    /**
+     * Ottiene gli eventi per un giorno specifico (solo eventi visibili)
      */
     getEventsForDay(date) {
-        return this.events.filter(event => {
+        const visibleEvents = this.getVisibleEvents();
+        return visibleEvents.filter(event => {
             return event.date.getDate() === date.getDate() &&
                    event.date.getMonth() === date.getMonth() &&
                    event.date.getFullYear() === date.getFullYear();
