@@ -282,11 +282,15 @@
 
 .availability-grid {
     display: grid;
-    grid-template-columns: 60px repeat(auto-fit, minmax(200px, 1fr));
     border: 1px solid #c9c9c9;
     background-color: #c9c9c9;
     gap: 1px;
     min-width: 400px;
+}
+
+/* Dinamicamente impostato tramite inline style per numero colonne */
+.availability-grid[style*="--calendar-count"] {
+    grid-template-columns: 60px repeat(var(--calendar-count, 1), 1fr);
 }
 
 .calendar-column-header {

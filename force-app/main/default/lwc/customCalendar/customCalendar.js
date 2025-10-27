@@ -99,6 +99,14 @@ export default class CustomCalendar extends LightningElement {
         return this.calendarDays?.calendarHeaders || [];
     }
 
+    get calendarCount() {
+        return this.calendarHeadersData.length || 1;
+    }
+
+    get availabilityGridStyle() {
+        return `--calendar-count: ${this.calendarCount};`;
+    }
+
     // Getter per debug
     get eventsCount() {
         return this.events?.length || 0;
