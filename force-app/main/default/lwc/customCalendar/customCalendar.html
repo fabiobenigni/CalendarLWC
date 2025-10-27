@@ -23,19 +23,19 @@
                     <lightning-button-group>
                         <lightning-button 
                             label="Mese" 
-                            value="month"
+                            data-view="month"
                             variant={isMonthView} 
                             onclick={handleViewChange}>
                         </lightning-button>
                         <lightning-button 
                             label="Settimana" 
-                            value="week"
+                            data-view="week"
                             variant={isWeekView} 
                             onclick={handleViewChange}>
                         </lightning-button>
                         <lightning-button 
                             label="Giorno" 
-                            value="day"
+                            data-view="day"
                             variant={isDayView} 
                             onclick={handleViewChange}>
                         </lightning-button>
@@ -72,7 +72,7 @@
                     </template>
 
                     <!-- Celle giorni -->
-                    <template for:each={calendarDays} for:item="dayInfo">
+                    <template for:each={monthDaysData} for:item="dayInfo">
                         <div key={dayInfo.key} class={dayInfo.className}>
                             <div class="day-number">{dayInfo.day}</div>
                             <template if:true={dayInfo.hasEvents}>
@@ -95,7 +95,7 @@
                         <div class="time-column-header"></div>
                         
                         <!-- Header giorni settimana -->
-                        <template for:each={calendarDays.weekDays} for:item="day">
+                        <template for:each={weekDaysData} for:item="day">
                             <div key={day.key} class="week-day-header">
                                 <div class="day-name">{day.dayName}</div>
                                 <div class="day-number">{day.dayNumber}</div>
@@ -103,7 +103,7 @@
                         </template>
 
                         <!-- Griglia oraria -->
-                        <template for:each={calendarDays.gridRows} for:item="row">
+                        <template for:each={gridRowsData} for:item="row">
                             <!-- Colonna orario -->
                             <div key={row.key} class="time-slot-label">{row.timeLabel}</div>
                             
@@ -133,7 +133,7 @@
                         </div>
 
                         <!-- Griglia oraria -->
-                        <template for:each={calendarDays.gridRows} for:item="row">
+                        <template for:each={gridRowsData} for:item="row">
                             <!-- Colonna orario -->
                             <div key={row.key} class="time-slot-label">{row.timeLabel}</div>
                             

@@ -1,4 +1,4 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import getEvents from '@salesforce/apex/CalendarController.getEvents';
 
 export default class CustomCalendar extends LightningElement {
@@ -9,19 +9,18 @@ export default class CustomCalendar extends LightningElement {
     @api defaultView = 'month';
     
     // Stato componente
-    currentDate = new Date();
-    currentView = 'month';
+    @track currentDate = new Date();
+    @track currentView = 'month';
     weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
     weekDaysShort = ['L', 'M', 'M', 'G', 'V'];
-    calendarDays = [];
-    events = [];
-    isLoading = false;
-    error;
+    @track calendarDays = { days: [], weekDays: [], gridRows: [] };
+    @track events = [];
+    @track isLoading = false;
+    @track error;
 
     connectedCallback() {
         this.currentView = this.defaultView || 'month';
         this.loadEvents();
-        console.log('Calendario custom inizializzato - Vista:', this.currentView);
     }
 
     // Getter per le viste (booleani per template)
@@ -50,47 +49,115 @@ export default class CustomCalendar extends LightningElement {
         return this.currentView === 'day' ? 'brand' : 'neutral';
     }
 
+    // Getter di sicurezza per le viste
+    get monthDaysData() {
+        return this.calendarDays?.days || [];
+    }
+
+    get weekDaysData() {
+        return this.calendarDays?.weekDays || [];
+    }
+
+    get gridRowsData() {
+        return this.calendarDays?.gridRows || [];
+    }
+
+    // Getter per debug
+    get eventsCount() {
+        return this.events?.length || 0;
+    }
+
     /**
-     * Carica gli eventi dal server per il mese corrente
+     * Formatta una data in formato YYYY-MM-DD senza problemi di timezone
+     */
+    formatDateForApex(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    /**
+     * Parse di una data/ora da Apex (formato ISO) in un oggetto Date locale
+     * senza problemi di conversione timezone
+     */
+    parseApexDateTime(isoString) {
+        // Formato ISO da Apex: "2025-10-27T08:30:00.000Z"
+        // Estraiamo i componenti e creiamo una data locale
+        const match = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+            const [, year, month, day, hours, minutes, seconds] = match;
+            return new Date(
+                parseInt(year),
+                parseInt(month) - 1, // I mesi in JS partono da 0
+                parseInt(day),
+                parseInt(hours),
+                parseInt(minutes),
+                parseInt(seconds)
+            );
+        }
+        // Fallback se il formato non corrisponde
+        return new Date(isoString);
+    }
+
+    /**
+     * Carica gli eventi dal server per il range corrente (basato sulla vista)
      */
     loadEvents() {
         this.isLoading = true;
         this.error = undefined;
         
-        // Calcola primo e ultimo giorno del mese
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-        const startDate = new Date(year, month, 1);
-        const endDate = new Date(year, month + 1, 0, 23, 59, 59);
+        let startDate, endDate;
         
-        console.log('Caricamento eventi da', startDate, 'a', endDate);
+        // Calcola range basato sulla vista corrente
+        if (this.currentView === 'month') {
+            // Range: mese intero
+            const year = this.currentDate.getFullYear();
+            const month = this.currentDate.getMonth();
+            startDate = new Date(year, month, 1);
+            endDate = new Date(year, month + 1, 0);
+        } else if (this.currentView === 'week') {
+            // Range: settimana corrente (Lunedì-Venerdì)
+            startDate = this.getWeekStart(this.currentDate);
+            endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 4); // Venerdì
+        } else {
+            // Range: giorno corrente (dall'inizio del giorno all'inizio del giorno successivo)
+            startDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate());
+            endDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate() + 1);
+        }
         
-        // Chiama Apex
+        // Chiama Apex con date formattate correttamente
         getEvents({ 
-            startDate: startDate.toISOString().split('T')[0], 
-            endDate: endDate.toISOString().split('T')[0] 
+            startDate: this.formatDateForApex(startDate), 
+            endDate: this.formatDateForApex(endDate) 
         })
         .then(data => {
-            console.log('Eventi ricevuti:', data);
             // Trasforma eventi per il calendario
-            this.events = data.map(event => ({
-                id: event.id,
-                title: event.title,
-                date: new Date(event.startDateTime),
-                startTime: this.formatTime(new Date(event.startDateTime)),
-                endTime: this.formatTime(new Date(event.endDateTime)),
-                color: event.color,
-                description: event.description,
-                location: event.location,
-                ownerName: event.ownerName,
-                eventType: event.eventType
-            }));
+            this.events = data.map(event => {
+                // Parse della data senza problemi di timezone
+                const startDate = this.parseApexDateTime(event.startDateTime);
+                const endDate = this.parseApexDateTime(event.endDateTime);
+                
+                return {
+                    id: event.id,
+                    title: event.title,
+                    date: startDate,
+                    startTime: this.formatTime(startDate),
+                    endTime: this.formatTime(endDate),
+                    color: event.color,
+                    description: event.description,
+                    location: event.location,
+                    ownerName: event.ownerName,
+                    eventType: event.eventType
+                };
+            });
             
             this.isLoading = false;
             this.generateCalendar();
         })
         .catch(error => {
-            console.error('Errore caricamento eventi:', error);
+            console.error('❌ Errore caricamento eventi:', error);
             this.error = error.body ? error.body.message : 'Errore sconosciuto';
             this.isLoading = false;
             this.events = [];
@@ -114,9 +181,9 @@ export default class CustomCalendar extends LightningElement {
             'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
         ];
         
-        if (this.isMonthView) {
+        if (this.showMonthView) {
             return `${months[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-        } else if (this.isWeekView) {
+        } else if (this.showWeekView) {
             const weekStart = this.getWeekStart(this.currentDate);
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekEnd.getDate() + 4); // Venerdì
@@ -130,9 +197,25 @@ export default class CustomCalendar extends LightningElement {
      * Gestisce il cambio vista
      */
     handleViewChange(event) {
-        const newView = event.target.value;
+        const newView = event.currentTarget.dataset.view;
+        
+        if (!newView || newView === this.currentView) {
+            return;
+        }
+        
+        // IMPORTANTE: Cambio la vista PRIMA di resettare i dati
         this.currentView = newView;
-        this.generateCalendar();
+        
+        // Reset dello stato
+        this.isLoading = true;
+        this.calendarDays = { days: [], weekDays: [], gridRows: [] };
+        
+        // Reimposta la data corrente (oggi)
+        this.currentDate = new Date();
+        
+        // Ricarica gli eventi con il nuovo range
+        // Il metodo loadEvents() chiamerà generateCalendar() alla fine
+        this.loadEvents();
     }
 
     /**
@@ -146,11 +229,11 @@ export default class CustomCalendar extends LightningElement {
     }
 
     generateCalendar() {
-        if (this.isMonthView) {
+        if (this.showMonthView) {
             this.generateMonthView();
-        } else if (this.isWeekView) {
+        } else if (this.showWeekView) {
             this.generateWeekView();
-        } else if (this.isDayView) {
+        } else if (this.showDayView) {
             this.generateDayView();
         }
     }
@@ -212,8 +295,7 @@ export default class CustomCalendar extends LightningElement {
             });
         }
         
-        this.calendarDays = days;
-        console.log(`Calendario generato per ${this.currentMonthYear}:`, this.calendarDays.length, 'celle');
+        this.calendarDays = { days: days, weekDays: [], gridRows: [] };
     }
 
     /**
@@ -226,8 +308,8 @@ export default class CustomCalendar extends LightningElement {
 
         // Genera 5 giorni lavorativi (Lun-Ven)
         for (let i = 0; i < 5; i++) {
-            const day = new Date(weekStart);
-            day.setDate(day.getDate() + i);
+            const day = new Date(weekStart.getTime()); // Crea una nuova copia
+            day.setDate(weekStart.getDate() + i);
             
             const dayEvents = this.getEventsForDay(day);
             
@@ -267,8 +349,7 @@ export default class CustomCalendar extends LightningElement {
             return row;
         });
 
-        this.calendarDays = { weekDays, gridRows };
-        console.log('Vista settimanale generata:', weekDays.length, 'giorni,', gridRows.length, 'slot');
+        this.calendarDays = { days: [], weekDays, gridRows };
     }
 
     /**
@@ -295,8 +376,7 @@ export default class CustomCalendar extends LightningElement {
             };
         });
 
-        this.calendarDays = { gridRows };
-        console.log('Vista giornaliera generata:', gridRows.length, 'slot');
+        this.calendarDays = { days: [], weekDays: [], gridRows };
     }
 
     /**
@@ -337,21 +417,53 @@ export default class CustomCalendar extends LightningElement {
         });
     }
 
+    /**
+     * Navigazione precedente (mese/settimana/giorno in base alla vista)
+     */
     previousMonth() {
-        this.currentDate = new Date(
-            this.currentDate.getFullYear(),
-            this.currentDate.getMonth() - 1,
-            1
-        );
+        if (this.currentView === 'month') {
+            // Mese precedente
+            this.currentDate = new Date(
+                this.currentDate.getFullYear(),
+                this.currentDate.getMonth() - 1,
+                1
+            );
+        } else if (this.currentView === 'week') {
+            // Settimana precedente (7 giorni indietro)
+            const newDate = new Date(this.currentDate);
+            newDate.setDate(newDate.getDate() - 7);
+            this.currentDate = newDate;
+        } else {
+            // Giorno precedente
+            const newDate = new Date(this.currentDate);
+            newDate.setDate(newDate.getDate() - 1);
+            this.currentDate = newDate;
+        }
         this.loadEvents();
     }
 
+    /**
+     * Navigazione successiva (mese/settimana/giorno in base alla vista)
+     */
     nextMonth() {
-        this.currentDate = new Date(
-            this.currentDate.getFullYear(),
-            this.currentDate.getMonth() + 1,
-            1
-        );
+        if (this.currentView === 'month') {
+            // Mese successivo
+            this.currentDate = new Date(
+                this.currentDate.getFullYear(),
+                this.currentDate.getMonth() + 1,
+                1
+            );
+        } else if (this.currentView === 'week') {
+            // Settimana successiva (7 giorni avanti)
+            const newDate = new Date(this.currentDate);
+            newDate.setDate(newDate.getDate() + 7);
+            this.currentDate = newDate;
+        } else {
+            // Giorno successivo
+            const newDate = new Date(this.currentDate);
+            newDate.setDate(newDate.getDate() + 1);
+            this.currentDate = newDate;
+        }
         this.loadEvents();
     }
 
