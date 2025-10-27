@@ -1,8 +1,42 @@
 <template>
     <lightning-card title="Calendario Personalizzato" icon-name="standard:event">
         <div class="slds-p-around_medium">
-            <!-- Container per FullCalendar -->
-            <div lwc:dom="manual" class="calendar-container"></div>
+            <!-- Header con navigazione -->
+            <div class="calendar-header">
+                <lightning-button 
+                    icon-name="utility:chevronleft" 
+                    variant="neutral" 
+                    onclick={previousMonth}>
+                </lightning-button>
+                <h2 class="calendar-title">{currentMonthYear}</h2>
+                <lightning-button 
+                    icon-name="utility:chevronright" 
+                    variant="neutral" 
+                    onclick={nextMonth}>
+                </lightning-button>
+            </div>
+
+            <!-- Griglia calendario -->
+            <div class="calendar-grid">
+                <!-- Header giorni settimana -->
+                <template for:each={weekDays} for:item="day">
+                    <div key={day} class="calendar-weekday">{day}</div>
+                </template>
+
+                <!-- Celle giorni -->
+                <template for:each={calendarDays} for:item="dayInfo">
+                    <div key={dayInfo.key} class={dayInfo.className}>
+                        <div class="day-number">{dayInfo.day}</div>
+                        <template if:true={dayInfo.hasEvents}>
+                            <template for:each={dayInfo.events} for:item="event">
+                                <div key={event.id} class="calendar-event" style={event.style} onclick={handleEventClick} data-id={event.id}>
+                                    {event.title}
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </template>
+            </div>
         </div>
     </lightning-card>
 </template>

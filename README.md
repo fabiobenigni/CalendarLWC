@@ -15,9 +15,11 @@ Creare un componente calendario personalizzato che:
 
 ### ✅ STEP 1 - Setup Base (COMPLETATO)
 - [x] Struttura progetto SFDX
-- [x] Componente LWC base con FullCalendar
-- [x] Vista mensile statica con dati mock
-- [x] Integrazione FullCalendar.js (MIT License)
+- [x] Componente LWC base custom (senza librerie esterne)
+- [x] Vista mensile con griglia calendario custom
+- [x] Navigazione mese precedente/successivo
+- [x] Eventi mock con colori personalizzati
+- [x] Stili SLDS integrati con Lightning Design System
 
 ### 🔄 STEP 2 - Integrazione Dati (In arrivo)
 - [ ] Apex class per recuperare Event
@@ -49,8 +51,10 @@ Creare un componente calendario personalizzato che:
 ## 🛠️ Tecnologie Utilizzate
 
 - **Salesforce Lightning Web Components (LWC)**
-- **FullCalendar.js v6.1.10** (MIT License)
-- **Apex** (per recupero dati)
+- **Salesforce Lightning Design System (SLDS)**
+- **JavaScript Nativo** (senza dipendenze esterne)
+- **CSS Grid** (per layout calendario)
+- **Apex** (per recupero dati - prossimi step)
 - **SFDX** (Salesforce DX)
 
 ## 📦 Struttura Progetto
@@ -58,14 +62,13 @@ Creare un componente calendario personalizzato che:
 ```
 force-app/main/default/
 ├── lwc/
-│   └── customCalendar/        # Componente calendario principale
-│       ├── customCalendar.html
-│       ├── customCalendar.js
-│       ├── customCalendar.css
+│   └── customCalendar/             # Componente calendario principale
+│       ├── customCalendar.html     # Template con griglia calendario
+│       ├── customCalendar.js       # Logica calendario custom
+│       ├── customCalendar.css      # Stili SLDS
 │       └── customCalendar.js-meta.xml
-└── staticresources/
-    ├── fullcalendar.js        # Libreria FullCalendar
-    └── fullcalendar.resource-meta.xml
+└── applications/
+    └── Calendar_Demo_App.app-meta.xml  # App Lightning di esempio
 ```
 
 ## 🚀 Installazione e Deploy
@@ -97,7 +100,7 @@ sf org open
 
 ## 📄 Licenza
 
-Progetto privato. FullCalendar.js è distribuito con licenza MIT.
+Progetto privato. Implementazione 100% custom senza dipendenze esterne.
 
 ## 👤 Autore
 
