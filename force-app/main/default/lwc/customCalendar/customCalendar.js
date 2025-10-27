@@ -24,7 +24,7 @@ export default class CustomCalendar extends LightningElement {
     @track selectedEvent = null;
 
     // Sidebar
-    @track isSidebarOpen = true;
+    @track isSidebarOpen = false;
     
     // Gestione calendari e colori
     get myCalendars() {
